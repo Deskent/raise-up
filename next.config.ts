@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_APP_VERSION: pkg.version,
   },
   allowedDevOrigins: ["192.168.0.27"],
+  output: "standalone",
 };
 
 export default nextConfig;
