@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: pkg.version,
   },
-  allowedDevOrigins: ["192.168.0.27"],
+  allowedDevOrigins: ["192.168.0.27", "deskent.ru"],
   output: "standalone",
 };
 
