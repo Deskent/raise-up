@@ -1,15 +1,11 @@
+# syntax=docker/dockerfile:1
+
 FROM node:22-alpine AS base
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 RUN npm install -g pnpm@11.20.0
-
-RUN pnpm config set registry https://registry.npmjs.org/ \
-    && pnpm config set fetch-retries 5 \
-    && pnpm config set fetch-retry-factor 2 \
-    && pnpm config set fetch-retry-mintimeout 10000 \
-    && pnpm config set fetch-retry-maxtimeout 120000
 
 
 FROM base AS deps
@@ -18,7 +14,8 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
 
 
 FROM base AS builder
@@ -47,9 +44,6 @@ RUN addgroup --system --gid 1001 nodejs \
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Если папки public нет — эту строку можно убрать
-# COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
 
